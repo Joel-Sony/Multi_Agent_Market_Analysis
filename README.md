@@ -1,11 +1,11 @@
 # Collaborative Multi-Agent Market Analysis System (CrewAI + RAG)
+This project analyzes customer reviews using AI.
 
-This project implements a Collaborative Multi-Agent Market Analysis System using CrewAI and Retrieval-Augmented Generation (RAG).
+The program reads a dataset of reviews, retrieves relevant feedback using a vector database, and then uses multiple AI agents to examine the data. Each agent performs a specific task such as identifying customer sentiment, finding common complaints, and detecting frequently praised features.
 
-The system analyzes customer reviews and generates structured business insights.
-Multiple AI agents with specialized roles work together to extract sentiment, identify patterns in customer feedback, and produce a final market analysis report.
+The system finally generates a structured report summarizing the overall sentiment, major issues mentioned by customers, positive aspects of the product or service, and business insights based on the reviews.      
 
-The goal is to demonstrate how multi-agent AI systems can automate market intelligence from large collections of textual data.
+- Sample_report: [View Report]('./market_analysis_report.md')
 
 --- 
 ## Features
