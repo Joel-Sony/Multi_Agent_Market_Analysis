@@ -26,17 +26,6 @@
 - **Multi-Agent Collaboration:** Employs **CrewAI** to orchestrate four distinct personas, simulating a real-world analytics department. Each agent builds upon the previous agent's findings, producing deep, nuanced synthesis rather than shallow summaries.
 - **Llama 3.3 70B Integration:** Powered by Groq's blazing-fast inference API, leveraging a massive 70-billion parameter model for unparalleled cognitive reasoning.
 
-### Premium Web Dashboard (Flask + Vanilla JavaScript)
-- **Glassmorphism Dark Theme UI:** A sleek, modern user interface built from scratch without bloated CSS frameworks. Features subtle ambient background glows, micro-interactions, and responsive layout grids.
-- **Live Dataset Statistics:** Animated counter cards dynamically read the underlying CSV to display total reviews, exact positive/negative splits, and character distributions.
-- **Interactive Sentiment Charting:** Real-time data visualization via `Chart.js`, rendered as an animated, tooltip-enabled doughnut chart.
-- **Real-Time Analysis Polling:** The "Run Analysis" interface transforms into a live status tracker, showing exactly which AI agent is currently "thinking" and what sub-task they are executing.
-- **In-Browser Markdown Rendering:** Final strategic reports are compiled, styled, and rendered directly in the dashboard UI using `marked.js`, fully formatted with tables, lists, and headers.
-- **Report History Management:** A persistent sidebar automatically tracks, saves, and lists all prior analysis runs, allowing one-click reloading of historical market research.
-
-###  Production-Ready Modularity
-- **Modular Codebase:** Completely refactored from a monolithic script into specialized Python modules (`rag/`, `agents/`, `tasks/`, `config.py`), adhering to software engineering best practices.
-- **Robust Orchestration Engine:** The `crew.py` core cleanly injects dependencies and manages the asynchronous hand-offs between the embedding vector store and the LLM workers.
 
 ---
 
