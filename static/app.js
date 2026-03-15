@@ -30,6 +30,10 @@ async function loadDatasetStats() {
         animateCounter('stat-avg-len-val', data.avg_review_length, ' chars');
 
         renderSentimentChart(data.positive_reviews, data.negative_reviews);
+        
+        if (data.filename) {
+            document.getElementById('active-dataset-name').textContent = `(${data.filename})`;
+        }
     } catch (err) {
         console.error('Failed to load stats:', err);
     }
@@ -54,6 +58,60 @@ function animateCounter(elementId, target, suffix = '') {
     }
 
     requestAnimationFrame(update);
+}
+
+// ── File Upload ──────────────────────────────────────────────
+async function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    if (!file.name.endsWith('.csv')) {
+        alert('Please select a valid CSV file.');
+        event.target.value = '';
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const nameEl = document.getElementById('active-dataset-name');
+    const originalText = nameEl.textContent;
+    nameEl.textContent = '(Uploading and embedding...)';
+
+    try {
+        const res = await fetch('/api/upload-dataset', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await res.json();
+        
+        if (data.error) {
+            alert('Upload error: ' + data.error);
+            nameEl.textContent = originalText;
+            event.target.value = '';
+            return;
+        }
+        
+        // Update stats
+        animateCounter('stat-total-val', data.total_reviews);
+        animateCounter('stat-positive-val', data.positive_reviews);
+        animateCounter('stat-negative-val', data.negative_reviews);
+        animateCounter('stat-avg-len-val', data.avg_review_length, ' chars');
+        renderSentimentChart(data.positive_reviews, data.negative_reviews);
+        
+        if (data.filename) {
+            nameEl.textContent = `(${data.filename})`;
+        }
+        
+        event.target.value = '';
+
+    } catch (err) {
+        console.error('Failed to upload file:', err);
+        alert('Failed to upload file. Check server logs.');
+        nameEl.textContent = originalText;
+        event.target.value = '';
+    }
 }
 
 // ── Sentiment Chart ──────────────────────────────────────────

@@ -9,3 +9,5 @@ sentence-transformers
 pandas
 flask
 python-dotenv
+pywebview
+pyinstaller

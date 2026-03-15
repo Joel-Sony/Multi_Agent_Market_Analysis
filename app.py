@@ -7,16 +7,23 @@ report management.
 """
 
 import os
+import sys
 import json
 import threading
 from datetime import datetime
 from flask import Flask, render_template, jsonify, request
+from werkzeug.utils import secure_filename
 
-from config import OUTPUT_DIR, FLASK_HOST, FLASK_PORT
-from rag.pipeline import get_dataset_stats
+from config import OUTPUT_DIR, FLASK_HOST, FLASK_PORT, UPLOAD_DIR
+from rag.pipeline import get_dataset_stats, set_active_dataset
 from crew import run_analysis
 
-app = Flask(__name__)
+# Support for PyInstaller built executable
+if getattr(sys, 'frozen', False):
+    template_folder = os.path.join(sys._MEIPASS, 'templates')
+    app = Flask(__name__, template_folder=template_folder)
+else:
+    app = Flask(__name__)
 
 # ── In-memory analysis state ──────────────────────────────────────
 analysis_state = {
@@ -40,9 +47,43 @@ def dataset_stats():
     """Return dataset statistics as JSON."""
     try:
         stats = get_dataset_stats()
+        # Add filename default for the frontend
+        from config import DATASET_PATH
+        from rag.pipeline import ACTIVE_DATASET_PATH
+        stats["filename"] = os.path.basename(ACTIVE_DATASET_PATH) if ACTIVE_DATASET_PATH else os.path.basename(DATASET_PATH)
         return jsonify(stats)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/upload-dataset", methods=["POST"])
+def upload_dataset():
+    """Handle custom CSV file uploads."""
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+        
+    if file and file.filename.endswith('.csv'):
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(UPLOAD_DIR, filename)
+        file.save(filepath)
+        
+        try:
+            # Update the rag pipeline to point to this new dataset
+            set_active_dataset(filepath)
+            
+            # Get new stats to confirm and return to frontend
+            stats = get_dataset_stats()
+            stats["filename"] = filename
+            return jsonify(stats)
+            
+        except Exception as e:
+            return jsonify({"error": f"Failed to process CSV: {str(e)}"}), 500
+            
+    return jsonify({"error": "Invalid file type. Only CSV files are allowed."}), 400
 
 
 @app.route("/api/analyze", methods=["POST"])
